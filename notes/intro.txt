@@ -1,0 +1,89 @@
+# Attention model of binocular rivalry
+
+## Abstract
+
+Competing image supresses rival through gain changes
+ * Similar to attention
+ * Link to attention
+
+Two main components of the model:
+ * Attention
+ * Mutual inhibition
+
+These have different characteristics:
+ * Feature (attention) vs. eye (inhibition)
+ * fast (inhibition) vs. slow (attention)
+
+Hallmarks:
+ * attention required
+ * different states when images are swapped at high frequency (don't really understand what that's supposed to mean. have to go back later. That is, depending on the frequency of change the percept follows one eye or it follows one stimulus
+ * Level't proposition (look up) predicts dominance duration as a function of input strength. 
+
+
+## Intro
+
+Classical models consider mainly lateral inhibition and are driven by bottom up input. But data shows that rivalry requires attention. 
+New model: Stimuli compete for attention. Attention is modeled as multiplicative gain (have to look at note for this one). Is present when attention is on stimuli. Higher sensory activation leads to multiplicative gain and drives attention away from other stimulus.
+Mutual inhibition is modeled by opponency neurons that take in input from monocular neurons and supress output for one.
+	
+
+## Methods
+
+### Type of model
+
+No single neuron model. "Neuron" output in model is supposed to be linked to mean firing rate of an ensemble of neurons with similar firing properties. Canonical input-output-function is assumed. Model is supposed to capture the signal-processing related activity in visual cortex, not the biophysical mechanism.
+
+### General structure
+
+3 classes of neurons responsible for:
+ * sensory representation
+ * attentional modulation
+ * mutual inhibition
+
+### Sensory representation
+
+6 Total neurons for sensory representations, divided in to three populations with two neurons each. One each per eye and one for binocular summation:
+
+ * Left eye neurons (LE)
+ * Right eye neurons (RE)
+ * Binocular summation neurons
+
+There are two neurons per population, one for each of two orthogonal representations.
+
+#### Monocular neurons
+
+Four monocular neurons are similar, with different inputs. These neurons are characterized as *R[i,j]* where i and j are subscripts for eye and orientation.
+
+Change in response (times a time constant) depends on:
+
+ * E: Excitatory drive
+ * S: Suppressive drive
+ * H: Adaptation
+
+Excitatory drive depends on stimulus property and is determined by input *D*.
+E = [D^n - wo*O]+ [1 + wa*Ra]+
+D depends on stimulus contrast and increases monotonically with increasing contrast.
+O is the mutual inhibition from opponency neuron that respons to the opposite eye. I'm not yet sure how that works.
+[1 + wa * Ra] is the attention gain factor. 1 is baseline attention gain and Ra1 is the activation of the respective attention neuron. Will have to look this up.
+
+wo and wa are free parameters of the model and determine the influence of mutual inhibition and attention gain respectively.
+
+[]+ means half-wave rectification. In practice it's something like the exponential of the non-negative input and 0 if input is negative.
+
+S is the supressive drive, the sum of all excitatory drives. I.e. it's role is scaling.
+
+n and \sigma determine dose-response relationship between the input and the excitatory drive
+
+\alpha determines the max response.
+
+\tau is a time constant, the unit of updating.
+
+H is the adaptation term that slowly brings neurons back to baseline, depending on the parameter wh.
+
+#### Summation neurons
+
+Summation neurons work similar to monocular neurons. The excitatory drive is a power of the sum of the two monocular neurons per eye. Supression is the same as the excitatory drive. And there is also a self-adapting term that depends on wh. I assume wh is the same for all neurons. Binocular neurons do not show mutual inhibition in this model. Here they are used to prove input to the attention layer.
+
+
+
+
