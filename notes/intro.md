@@ -84,6 +84,17 @@ H is the adaptation term that slowly brings neurons back to baseline, depending 
 
 Summation neurons work similar to monocular neurons. The excitatory drive is a power of the sum of the two monocular neurons per eye. Supression is the same as the excitatory drive. And there is also a self-adapting term that depends on wh. I assume wh is the same for all neurons. Binocular neurons do not show mutual inhibition in this model. Here they are used to prove input to the attention layer.
 
+### Attention modulation
+
+Stronger orientation gets stronger attention gain. There are two attention neurons in the attention layer. One neuron per orientation.  The excitatory drive of this neuron depends on the difference in activation of the summation neurons. This difference is raised to some power. 
+The supressive drive is the sum of the half-rectified activation of the excitatory drive of both attention neurons. Somehow this accomodates the negative response of some neurons but I'm not sure how that works. Maybe this way the attention weight in total can not get below 0. 
+The time constant of attentional modulation is considerably slower of the time frame of sensory input. This is probably due to theoretical constraints. 
+
+### Mutual inhibition
+
+Is mediated through opponency neurons. There are 4, one for each combination of eye and orientation. I.e. one pair of left-minus-right, one pair of right-minus-left neurons. 
+The excitatory drive of the right-eye opponency-neuron selective for orientation _a_ depends on the difference of the activation of the right- and left-eye neurons for this orientation. Supressive drive was computed over orientations but not over eyes. I.e. S = sum(Eor1, Eor2). Both right-eye opponency neuron activations were summed up in **O**r (for the right eye) and act inhibitory on the excitatory drive of the left monocular neurons.
+These opponency neurons don't inhibit the opposing eye if there's no input in their respective retina. I.e. with stationary monocular-plaid stimuli, they don't predict any changing percepts.
 
 
 
