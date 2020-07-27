@@ -1,5 +1,8 @@
 import numpy as np
 from itertools import product
+import sys
+sys.path.append('.')
+from utilities import *
 
 
 class SensoryNeuron(BaseClass):

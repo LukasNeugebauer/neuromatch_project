@@ -2,8 +2,8 @@ import numpy as np
 from itertools import product
 import sys
 sys.path.append('.')
-from utilities import BaseClass, smooth_self.rectification, non_smooth_self.rectification
 from neurons import *
+from utilities import *
 
 class SensoryPopulation(BaseClass):
     
