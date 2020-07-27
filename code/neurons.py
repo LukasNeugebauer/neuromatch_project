@@ -6,7 +6,7 @@ from utilities import *
 
 
 class SensoryNeuron(BaseClass):
-    
+
     def __init__(
         self,
         eye,
@@ -36,7 +36,7 @@ class SensoryNeuron(BaseClass):
         self.tau_habituation = tau_habituation
         self.response = init_response
         self.habituation = init_habituation
-        
+
     def update_state(
         self,
         suppressive_drive,
@@ -46,13 +46,13 @@ class SensoryNeuron(BaseClass):
         _change_in_response = self._calculate_change_in_response(suppressive_drive, dt)
         self.response += _change_in_response
         self.habituation += _change_in_habituation
-        
+
     @property
     def excitatory_drive(
         self
     ):
         return self._excitatory_drive
-    
+
     def compute_excitatory_drive(
         self,
         sensory_input,
@@ -67,7 +67,7 @@ class SensoryNeuron(BaseClass):
         ) * self.rectification(
             1 + self.weight_attention * attention_response
         )
-    
+
     def _calculate_change_in_response(
         self,
         suppressive_drive
@@ -78,7 +78,7 @@ class SensoryNeuron(BaseClass):
             (suppressive_drive + self.habituation ** self.n + self.sigma ** self.n)
         ) * (dt / self.tau_response)
         return change_in_response
-        
+
     def _calculate_change_in_habituation(
         self
     ):
@@ -87,10 +87,10 @@ class SensoryNeuron(BaseClass):
             self.weight_habituation * self.response
         ) * (dt / self.tau_habituation)
         return change_in_habituation
-    
-    
+
+
 class SummationNeuron(BaseClass):
-    
+
     def __init__(
         self,
         orientation,
@@ -112,7 +112,7 @@ class SummationNeuron(BaseClass):
         self.tau_habituation = tau_habituation
         self.init_response = init_response
         self.init_habituation = init_habituation
-        
+
     def update_state(
         self,
         dt
@@ -121,13 +121,13 @@ class SummationNeuron(BaseClass):
         _change_in_response = self._calculate_change_in_response(dt)
         self.response += _change_in_response
         self.habituation += _change_in_habituation
-            
+
     @property
     def excitatory_drive(
         self
     ):
         return self._excitatory_drive
-    
+
     def compute_excitatory_drive(
         self,
         snapshot
@@ -135,13 +135,13 @@ class SummationNeuron(BaseClass):
         response_left = getattr(snapshot, f'sensory_left_{self.orientation}')
         response_right = getattr(snapshot, f'sensory_right_{self.orientation}')
         self._excitatory_drive = (response_left + response_right) ** self.n
-        
+
     @property
     def suppressive_drive(
         self
     ):
         return self._excitatory_drive
-    
+
     def _calculate_change_in_response(
         self,
         dt
@@ -151,7 +151,7 @@ class SummationNeuron(BaseClass):
             (self.suppressive_drive + self.habituation ** self.n + self.sigma ** self.n)
         ) * (dt / self.tau_response)
         return change_in_response
-    
+
     def _calculate_change_in_habituation(
         self,
         dt
@@ -161,10 +161,10 @@ class SummationNeuron(BaseClass):
             self.weight_habituation * self.response
         ) * (dt / self.tau_habituation)
         return change_in_habituation
-    
+
 
 class OpponencyNeuron(BaseClass):
-    
+
     def __init__(
         self,
         eye,
@@ -182,7 +182,7 @@ class OpponencyNeuron(BaseClass):
         self.n = n
         self.tau_response = tau_response
         self.init_response = init_response
-        
+
     def update_state(
         self,
         suppressive_drive,
@@ -190,19 +190,19 @@ class OpponencyNeuron(BaseClass):
     ):
         _change_in_response = self.calculate_change_in_response(suppressive_drive, dt)
         self.response += _change_in_response
-        
+
     @property
     def excitatory_drive(
         self
     ):
         return self._excitatory_drive
-    
+
     def compute_excitatory_drive(
         self,
         snapshot
     ):
         self._excitatory_drive = self.rectification(response_same_eye - response_other_eye) ** self.n
-        
+
     def calculate_change_in_response(
         self,
         suppressive_drive,
@@ -214,10 +214,10 @@ class OpponencyNeuron(BaseClass):
             (suppressive_drive + self.sigma ** self.n)
         ) * (dt / self.tau_response)
         return change_in_response
-    
-    
+
+
 class AttentionNeuron(BaseClass):
-    
+
     def __init__(
         self,
         orientation,
@@ -231,7 +231,7 @@ class AttentionNeuron(BaseClass):
         self.n = n
         self.tau_response = tau_response
         self.response = init_response
-        
+
     def compute_excitatory_drive(
         self,
         snapshot
@@ -243,7 +243,7 @@ class AttentionNeuron(BaseClass):
             snapshot, f'summation_{sum(self.orientations) - self.orientation}'
         )
         self._excitatory_drive = (response_same_orientation - response_other_orientation) ** self.n
-    
+
     def update_state(
         self,
         suppressive_drive,
@@ -251,13 +251,13 @@ class AttentionNeuron(BaseClass):
     ):
         _change_in_response = self.calculate_change_in_response(suppressive_drive, dt)
         self.response += _change_in_response
-        
+
     @property
     def excitatory_drive(
         self
     ):
         return self._excitatory_drive
-        
+
     def calculate_change_in_response(
         self,
         suppressive_drive,
