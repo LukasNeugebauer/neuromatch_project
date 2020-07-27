@@ -21,7 +21,8 @@ class SensoryNeuron(BaseClass):
         tau_habituation,
         smooth_rectification,
         init_response,
-        init_habituation
+        init_habituation,
+        **kwargs
     ):
         super().__init__(smooth_rectification)
         self.eye = eye
@@ -62,15 +63,21 @@ class SensoryNeuron(BaseClass):
         opponency_response = np.sum(
             [getattr(snapshot, 'opponency_{}_{}'.format(self.eye, orientation)) for orientation in self.orientations]
         )
-        self._excitatory_drive = self.rectification(
-            sensory_input ** self.n - self.weight_opponency * opponency_response
-        ) * self.rectification(
-            1 + self.weight_attention * attention_response
-        )
+        try:
+            self._excitatory_drive = self.rectification(
+                sensory_input ** self.n - self.weight_opponency * opponency_response
+            ) * self.rectification(
+                1 + self.weight_attention * attention_response
+            )
+        except Exception as e:
+            raise e
+            from ipdb import set_trace
+            set_trace()
 
     def _calculate_change_in_response(
         self,
-        suppressive_drive
+        suppressive_drive,
+        dt
     ):
         change_in_response = (
             - self.response + 
@@ -80,7 +87,8 @@ class SensoryNeuron(BaseClass):
         return change_in_response
 
     def _calculate_change_in_habituation(
-        self
+        self,
+        dt
     ):
         change_in_habituation = (
             self.habituation + 
@@ -100,18 +108,17 @@ class SummationNeuron(BaseClass):
         tau_response,
         tau_habituation,
         init_response,
-        init_habituation
+        init_habituation,
+        **kwargs
     ):
         self.orientation = orientation
         self.sigma = sigma
         self.n = n
-        self.weight_opponency = weight_opponency
-        self.weight_attention = weight_attention
         self.weight_habituation = weight_habituation
         self.tau_response = tau_response
         self.tau_habituation = tau_habituation
-        self.init_response = init_response
-        self.init_habituation = init_habituation
+        self.response = init_response
+        self.habituation = init_habituation
 
     def update_state(
         self,
@@ -173,7 +180,8 @@ class OpponencyNeuron(BaseClass):
         n,
         tau_response,
         init_response,
-        smooth_rectification
+        smooth_rectification,
+        **kwargs
     ):
         super().__init__(smooth_rectification)
         self.eye = eye
@@ -181,7 +189,7 @@ class OpponencyNeuron(BaseClass):
         self.sigma = sigma
         self.n = n
         self.tau_response = tau_response
-        self.init_response = init_response
+        self.response = init_response
 
     def update_state(
         self,
@@ -201,6 +209,9 @@ class OpponencyNeuron(BaseClass):
         self,
         snapshot
     ):
+        other_eye = 'right' if self.eye == 'left' else 'left'
+        response_same_eye = getattr(snapshot, f'sensory_{self.eye}_{self.orientation}')
+        response_other_eye = getattr(snapshot, f'sensory_{other_eye}_{self.orientation}')
         self._excitatory_drive = self.rectification(response_same_eye - response_other_eye) ** self.n
 
     def calculate_change_in_response(
@@ -224,7 +235,8 @@ class AttentionNeuron(BaseClass):
         sigma,
         n,
         tau_response,
-        init_response
+        init_response,
+        **kwargs
     ):
         self.orientation = orientation
         self.sigma = sigma

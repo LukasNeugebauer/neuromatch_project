@@ -13,11 +13,12 @@ class Network(BaseClass):
         opponency_population_arguments,
         attention_population_arguments,
     ):
+        self.dt = dt
         self.init_populations(
             sensory_population_arguments,
             summation_population_arguments,
             opponency_population_arguments,
-            attention_populations_arguments
+            attention_population_arguments
         )
         
     @property
@@ -41,27 +42,31 @@ class Network(BaseClass):
         self, 
         sensory_population_arguments,
         summation_population_arguments,
-        attention_population_arguments,
-        opponency_population_arguments
+        opponency_population_arguments,
+        attention_population_arguments
     ):
         self.populations = {}
         self.populations['sensory'] = SensoryPopulation(**sensory_population_arguments)
         self.populations['summation'] = SummationPopulation(**summation_population_arguments)
+        self.populations['opponency'] = OpponencyPopulation(**opponency_population_arguments)
         self.populations['attention'] = AttentionPopulation(**attention_population_arguments)
-        self.populations['opponency'] = OpponencyPopulation(**opponency_populations_arguments)
         
     def simulate(self, sensory_input):
         """
         Expects n_timepoints x 2 sensory_input
         """
         timecourse = Timecourse([self.snapshot])
-        for t in sensory_input.shape[0]:
-            self.one_step(sensory_input[t, :])
+        for t in range(sensory_input.shape[0]):
+            self.one_step(sensory_input.iloc[t, :])
             timecourse.append(self.snapshot)
         return timecourse
             
     def one_step(self, sensory_input):
-        for population in self.populations:
-            population.compute_excitatory_drive(self.snapshot)
-        for population in self.populations:
-            population.update_state()
+        for kind, population in self.populations.items():
+            if kind == 'sensory':
+                population.compute_excitatory_drive(sensory_input, self.snapshot)
+            else:
+                population.compute_excitatory_drive(self.snapshot)
+        for population in self.populations.values():
+            population.update_state(self.dt)
+            

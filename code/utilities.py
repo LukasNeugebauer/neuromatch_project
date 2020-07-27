@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 
     
-@dataclass
+@dataclass(frozen=True)
 class Snapshot:
     
     sensory_left_1: float
@@ -23,16 +23,25 @@ class Snapshot:
         
 @dataclass
 class Timecourse:
-    pass
+    
+    snapshots: List[Snapshot]
+        
+    def append(self, snap):
+        self.snapshots.append(snap)
+        
+    def get_neuron_over_time(self, neuron):
+        return np.array([getattr(x, neuron) for x in self.snapshots])
         
         
 def smooth_rectification(x, threshold=.05, slope=30):
-    x[x < 0] = 0.
+    if x < 0:
+        x = 0
     return x / (1 + np.exp( - slope * (x - threshold)))    
 
 
 def non_smooth_rectification(x, n=1):
-    x[x < 0] = 0.
+    if x < 0:
+        x = 0
     return x ** n
 
 
@@ -43,9 +52,9 @@ class BaseClass:
     
     def __init__(
         self,
-        smooth_rectification=True
+        smooth=True
     ):
-        if smooth_rectficication:
+        if smooth_rectification:
             self.rectification = smooth_rectification
-        elif:
+        else:
             self.rectification = non_smooth_rectfication

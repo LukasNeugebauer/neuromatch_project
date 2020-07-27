@@ -18,19 +18,23 @@ class SensoryPopulation(BaseClass):
         tau_response,
         tau_habituation, 
         smooth_rectification,
-        initial_response=None,
-        initial_habituation=None
+        init_response={},
+        init_habituation={},
+        **kwargs
     ):
+        self.neurons = {}
         for eye, orientation in product(self.eyes, self.orientations):
             key = '_'.join([eye, str(orientation)])
-            if key in initial_response.keys():
-                _initial_response = initial_reponse[key]
+            if key in init_response.keys():
+                _init_response = init_reponse[key]
             else:
-                _initial_response = np.random.rand()
-            if key in initial_habituation.keys():
-                _initial_habituation = initial_habituation[key]
+                print(f'WARNING: Taking random start value for sensory neuron for eye {eye}, orientation {orientation}')
+                _init_response = np.random.rand()
+            if key in init_habituation.keys():
+                _init_habituation = init_habituation[key]
             else:    
-                _initial_habituation = np.random.rand()
+                print(f'WARNING: Taking random start habituation value for sensory neuron for eye {eye}, orientation {orientation}')
+                _init_habituation = np.random.rand()
             self.neurons[key] = SensoryNeuron(
                 eye=eye,
                 orientation=orientation,
@@ -42,8 +46,8 @@ class SensoryPopulation(BaseClass):
                 weight_habituation=weight_habituation,
                 tau_response=tau_response,
                 tau_habituation=tau_habituation,
-                initial_response=initial_response,
-                initial_habituation=initial_habituation,
+                init_response=_init_response,
+                init_habituation=_init_habituation,
                 smooth_rectification=smooth_rectification
             )
             
@@ -52,15 +56,14 @@ class SensoryPopulation(BaseClass):
         sensory_input,
         snap
     ):
-        for neuron in neurons.values():
-            neuron.compute_excitatory_drive(sensory_input, snap)
+        for key, neuron in self.neurons.items():
+            neuron.compute_excitatory_drive(sensory_input[key], snap)
         
     def update_state(
         self,
-        sensory_input,
-        snap
+        dt
     ):
-        for neuron in neurons.values():
+        for neuron in self.neurons.values():
             neuron.update_state(self.suppressive_drive, dt)
         
     @property
@@ -77,19 +80,23 @@ class SummationPopulation(BaseClass):
         weight_habituation,
         tau_response,
         tau_habituation, 
-        initial_response=None,
-        initial_habituation=None
+        init_response={},
+        init_habituation={},
+        **kwargs
     ):
+        self.neurons = {}
         for orientation in self.orientations:
             key = str(orientation)
-            if key in initial_response.keys():
-                _initial_response = initial_reponse[key]
+            if key in init_response.keys():
+                _init_response = init_reponse[key]
             else:
-                _initial_response = np.random.rand()
-            if key in initial_habituation.keys():
-                _initial_habituation = initial_habituation[key]
+                print(f'WARNING: Taking random start value for summation neuron for orientation {orientation}')
+                _init_response = np.random.rand()
+            if key in init_habituation.keys():
+                _init_habituation = init_habituation[key]
             else:    
-                _initial_habituation = np.random.rand()
+                print(f'WARNING: Taking random start habituation value for summation neuron for orientation {orientation}')
+                _init_habituation = np.random.rand()
             self.neurons[key] = SummationNeuron(
                 orientation=orientation,
                 sigma=sigma,
@@ -97,8 +104,8 @@ class SummationPopulation(BaseClass):
                 weight_habituation=weight_habituation,
                 tau_response=tau_response,
                 tau_habituation=tau_habituation,
-                initial_response=initial_response,
-                initial_habituation=initial_habituation
+                init_response=_init_response,
+                init_habituation=_init_habituation
             )
             
     def compute_excitatory_drive(
@@ -109,10 +116,11 @@ class SummationPopulation(BaseClass):
             neuron.compute_excitatory_drive(snapshot)
             
     def update_state(
-        self
+        self,
+        dt
     ):
         for orientation in self.orientations:
-            self.neurons[orientation].update_state()
+            self.neurons[str(orientation)].update_state(dt)
             
             
 class OpponencyPopulation(BaseClass):
@@ -123,25 +131,28 @@ class OpponencyPopulation(BaseClass):
         n,
         tau_response,
         smooth_rectification,
-        initial_response=None,
+        init_response={},
+        **kwargs
     ):
+        self.neurons = {}
         for eye, orientation in product(self.eyes, self.orientations):
             key = '_'.join([eye, str(orientation)])
-            if key in initial_response.keys():
-                _initial_response = initial_reponse[key]
+            if key in init_response.keys():
+                _init_response = init_reponse[key]
             else:
-                _initial_response = np.random.rand()
+                print(f'WARNING: Taking random start value for opponency neuron for eye {eye}, orientation {orientation}')
+                _init_response = np.random.rand()
             self.neurons[key] = OpponencyNeuron(
                 eye=eye,
                 orientation=orientation,
                 sigma=sigma,
                 n=n,
                 tau_response=tau_response,
-                initial_response=initial_response,
+                init_response=_init_response,
                 smooth_rectification=smooth_rectification
             )
             
-    def compute_excitatory_drives(
+    def compute_excitatory_drive(
         self,
         snapshot
     ):
@@ -156,15 +167,15 @@ class OpponencyPopulation(BaseClass):
         for eye in self.eyes:
             suppressive_drive_eye = suppressive_drives[eye]
             for orientation in self.orientations:
-                key = '_'.join([eye, orientation])
-                self.neurons[orientation].update_state(suppressive_drive_eye, dt)
+                key = '_'.join([eye, str(orientation)])
+                self.neurons[key].update_state(suppressive_drive_eye, dt)
                 
     @property
     def suppressive_drives(self):
         drives = {}
         for eye in self.eyes:
             drives[eye] = sum([
-                neurons['_'.join([eye, orientation])].excitatory_drive for orientation in self.orientations])
+                self.neurons['_'.join([eye, str(orientation)])].excitatory_drive for orientation in self.orientations])
         return drives
     
 
@@ -176,26 +187,27 @@ class AttentionPopulation(BaseClass):
         n,
         tau_response,
         smooth_rectification,
-        initial_response=None
+        init_response={},
+        **kwargs
     ):
         super().__init__(smooth_rectification)
         self.neurons = {}
         for orientation in self.orientations:
             key = str(orientation)
-            if key in initial_response.keys():
-                _initial_response = initial_reponse[key]
+            if key in init_response.keys():
+                _init_response = init_reponse[key]
             else:
                 print(f'WARNING: Taking random start value for attention neuron for orientation {key}')
-                _initial_response = np.random.rand()
+                _init_response = np.random.rand()
             self.neurons[key] = AttentionNeuron(
                 orientation=orientation,
                 sigma=sigma,
                 n=n,
                 tau_response=tau_response,
-                initial_response=_initial_response
+                init_response=_init_response
             )
             
-    def compute_excitatory_drives(
+    def compute_excitatory_drive(
         self,
         snapshot
     ):
