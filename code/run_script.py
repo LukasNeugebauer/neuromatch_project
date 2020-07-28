@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from network import Network
 from defaults import get_input, get_default_parameters
+import pickle
 
 
 if __name__ == '__main__':
@@ -17,7 +18,8 @@ if __name__ == '__main__':
     params[1]['init_habituation'] = {'1': 0, '2': 0}
     # opponency population
     opp_l_rand_matlab = 0.144064898688432
-    params[2]['init_response'] = {'left_1': 0, 'left_2': 0, 'right_1': opp_l_rand_matlab, 'right_2': opp_l_rand_matlab}
+    # params[2]['init_response'] = {'left_1': 0, 'left_2': 0, 'right_1': 0, 'right_2': 0}
+    params[2]['init_response'] = {'left_1': opp_l_rand_matlab, 'left_2': opp_l_rand_matlab, 'right_1': 0, 'right_2': 0}
     params[2]['init_habituation'] = {'left_1': 0, 'left_2': 0, 'right_1': 0, 'right_2': 0}
     # attention population
     params[3]['init_response'] = {'1': 0, '2': 0}
@@ -32,7 +34,7 @@ if __name__ == '__main__':
     total_duration = params[0]['total_duration']
 
     sensory_input = get_input(dt, total_duration)
-    sensory_input = sensory_input[:3000, :]
+    # sensory_input = sensory_input[:30000]
     # plt.plot(sensory_input.values[:100])
 
     timecourse = network.simulate(sensory_input)
@@ -51,9 +53,10 @@ if __name__ == '__main__':
 
     plt.show()
 
-    # save_path = open('last_timecourse.pkl', 'wb')
-    # pickle.dump(mydict, output)
-    # output.close()
+    # save the results
+    save_path = open('last_timecourse.pkl', 'wb')
+    pickle.dump(timecourse, save_path)
+    save_path.close()
 
     a = np.array([1.])
     print(a[a < 2])

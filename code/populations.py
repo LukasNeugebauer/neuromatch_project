@@ -66,7 +66,14 @@ class SensoryPopulation(BaseClass):
     ):
         for neuron in self.neurons.values():
             neuron.update_state(self.suppressive_drive, dt)
-        
+
+    def update_opponency_response(
+            self,
+            snap
+    ):
+        for key, neuron in self.neurons.items():
+            neuron.update_opponency_response(snap)
+
     @property
     def suppressive_drive(self):
         return sum([neuron.excitatory_drive for neuron in self.neurons.values()])

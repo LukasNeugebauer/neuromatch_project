@@ -3,6 +3,7 @@ sys.path.append('.')
 from populations import *
 from utilities import *
 
+
 class Network(BaseClass):
     
     def __init__(
@@ -71,6 +72,12 @@ class Network(BaseClass):
                 population.compute_excitatory_drive(sensory_input, self.snapshot)
             else:
                 population.compute_excitatory_drive(self.snapshot)
+
+        # now update opponency_response
+        for kind, population in self.populations.items():
+            if kind == 'sensory':
+                population.update_opponency_response(self.snapshot)
+
         for population in self.populations.values():
             population.update_state(self.dt)
             

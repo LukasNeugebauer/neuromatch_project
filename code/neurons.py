@@ -37,6 +37,7 @@ class SensoryNeuron(BaseClass):
         self.tau_habituation = tau_habituation
         self.response = init_response
         self.habituation = init_habituation
+        self.opponency_response = 0
 
     def update_state(
         self,
@@ -60,23 +61,28 @@ class SensoryNeuron(BaseClass):
         snapshot
     ):
         attention_response = getattr(snapshot, f'attention_{self.orientation}')
-        if self.eye == 'left':
-            other_eye = 'right'
-        else:
-            other_eye = 'left'
-        opponency_response = np.sum(
-            [getattr(snapshot, 'opponency_{}_{}'.format(other_eye, orientation)) for orientation in self.orientations]
-        )
         try:
             self._excitatory_drive = self.rectification(
-                sensory_input ** self.n - self.weight_opponency * opponency_response
+                sensory_input ** self.n - self.weight_opponency * self.opponency_response
             ) * self.rectification(
                 1 + self.weight_attention * attention_response
             )
         except Exception as e:
-            raise e
-            from ipdb import set_trace
-            set_trace()
+            print(2)
+            # raise e
+            # from ipdb import set_trace
+            # set_trace()
+
+    def update_opponency_response(
+            self,
+            snapshot):
+        if self.eye == 'left':
+            other_eye = 'right'
+        else:
+            other_eye = 'left'
+        self.opponency_response = np.sum(
+            [getattr(snapshot, 'opponency_{}_{}'.format(other_eye, orientation)) for orientation in self.orientations]
+        )
 
     def _calculate_change_in_response(
         self,
