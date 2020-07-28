@@ -91,7 +91,7 @@ class SensoryNeuron(BaseClass):
         dt
     ):
         change_in_habituation = (
-            self.habituation + 
+            - self.habituation +
             self.weight_habituation * self.response
         ) * (dt / self.tau_habituation)
         return change_in_habituation
@@ -164,7 +164,7 @@ class SummationNeuron(BaseClass):
         dt
     ):
         change_in_habituation = (
-            self.habituation + 
+            - self.habituation +
             self.weight_habituation * self.response
         ) * (dt / self.tau_habituation)
         return change_in_habituation
