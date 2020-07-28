@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from network import Network
 from defaults import get_input, get_default_parameters
 import pickle
+from scipy.io import loadmat
 
 
 if __name__ == '__main__':
@@ -20,6 +21,7 @@ if __name__ == '__main__':
     opp_l_rand_matlab = 0.144064898688432
     # params[2]['init_response'] = {'left_1': 0, 'left_2': 0, 'right_1': 0, 'right_2': 0}
     params[2]['init_response'] = {'left_1': opp_l_rand_matlab, 'left_2': opp_l_rand_matlab, 'right_1': 0, 'right_2': 0}
+    # params[2]['init_response'] = {'left_1': 0, 'left_2': 0, 'right_1': opp_l_rand_matlab, 'right_2': opp_l_rand_matlab}
     params[2]['init_habituation'] = {'left_1': 0, 'left_2': 0, 'right_1': 0, 'right_2': 0}
     # attention population
     params[3]['init_response'] = {'1': 0, '2': 0}
@@ -51,6 +53,17 @@ if __name__ == '__main__':
         ax.plot(timecourse.get_neuron_over_time(field))
         ax.set_title(field)
 
+    # plt.show()
+
+    ref_data_path = r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat'
+    mat_data = loadmat(ref_data_path)
+    fig, ax = plt.subplots(nrows=6, ncols=1)
+    ax[0].plot(np.array(mat_data['d1']).T)
+    ax[1].plot(np.array(mat_data['d2']).T)
+    ax[2].plot(np.array(mat_data['d3']).T)
+    ax[3].plot(np.array(mat_data['d4']).T)
+    ax[4].plot(np.array(mat_data['d5']).T)
+    ax[5].plot(np.array(mat_data['d6']).T)
     plt.show()
 
     # save the results
