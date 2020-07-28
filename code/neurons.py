@@ -60,7 +60,10 @@ class SensoryNeuron(BaseClass):
         snapshot
     ):
         attention_response = getattr(snapshot, f'attention_{self.orientation}')
-        other_eye = 'left' if self.eye =='right' else 'left'
+        if self.eye == 'left':
+            other_eye = 'right'
+        else:
+            other_eye = 'left'
         opponency_response = np.sum(
             [getattr(snapshot, 'opponency_{}_{}'.format(other_eye, orientation)) for orientation in self.orientations]
         )

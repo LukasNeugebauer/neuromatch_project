@@ -57,7 +57,11 @@ class Network(BaseClass):
         """
         timecourse = Timecourse([self.snapshot])
         for t in range(sensory_input.shape[0]):
-            self.one_step(sensory_input.iloc[t, :])
+            print(t, sensory_input.shape[0])
+            if t == sensory_input.shape[0] - 1:
+                self.one_step(sensory_input.iloc[t, :])
+            else:
+                self.one_step(sensory_input.iloc[t + 1, :])
             timecourse.append(self.snapshot)
         return timecourse
             

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def get_default_parameters(attended=True):
     dt = .5
     total_duration = 15000
@@ -12,13 +13,13 @@ def get_default_parameters(attended=True):
         'n_timepoints': time_vector.size,  # number of time point
         'n_locations': 1,           # simulate one location
         'n_orientations': 2,           # simulate two orienation
-        'n': 2, #exponent 
+        'n': 2,  # exponent
         'sigma': .5,    # suppression constant (for all layer, excpet attention layer, see p.sigma_a below)
-        'nLayers'       : 6,  # 2 monocular + 1 binocular-summation + 2 opponency + 1 attention layer
+        'nLayers': 6,  # 2 monocular + 1 binocular-summation + 2 opponency + 1 attention layer
         'tau_habituation': 2000,  # time constant for adaptation
         'weight_habituation': 2,     # weights of self-adaptation
         'weight_opponency': .65,   # weights of mutual inhibition
-        'weight_attention'   : .6,    # weights of attentional modulation
+        'weight_attention': .6,    # weights of attentional modulation
         'smooth_rectification': True
     }
     sensory_params, summation_params, opponency_params, attention_params = [params.copy() for _ in range(4)]
@@ -41,10 +42,10 @@ def get_default_parameters(attended=True):
     return sensory_params, summation_params, opponency_params, attention_params 
     
     
-def get_input(dt, total_duration, tau=3, contrast=np.array([[.5,0.],[0.,.5]]), flicker=0, alpha_amp=.5):
-    #todo: implement different
-    #todo: onset modulation
-    #sensory_input = np.empty(shape=(n_trials, 2), dtype=np.float)
+def get_input(dt, total_duration, tau=3, contrast=np.array([[.5, 0.], [0., .5]]), flicker=0, alpha_amp=.5):
+    # todo: implement different
+    # todo: onset modulation
+    # sensory_input = np.empty(shape=(n_trials, 2), dtype=np.float)
     time_vector = np.arange(0, total_duration, dt)
     n_trials = time_vector.size
     input_dummy = np.ones((n_trials, 2))
@@ -52,11 +53,11 @@ def get_input(dt, total_duration, tau=3, contrast=np.array([[.5,0.],[0.,.5]]), f
     input_left = input_dummy * contrast[0, :] 
     input_right = input_dummy * contrast[1, :]
     sensory_input = pd.DataFrame({
-        'left_1': input_left[:,0],
-        'left_2': input_left[:,1],
-        'right_1': input_right[:,0],
-        'right_2': input_right[:,1]
-    }, index = np.arange(time_vector.size)) * modulator
+        'left_1': input_left[:, 0],
+        'left_2': input_left[:, 1],
+        'right_1': input_right[:, 0],
+        'right_2': input_right[:, 1]
+    }, index=np.arange(time_vector.size)) * modulator
     return sensory_input
 
 

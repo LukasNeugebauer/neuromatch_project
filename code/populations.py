@@ -25,7 +25,7 @@ class SensoryPopulation(BaseClass):
     ):
         self.neurons = {}
         for eye, orientation in product(self.eyes, self.orientations):
-            key = '_'.join([eye, str(orientation)])
+            key = ''.join([eye, '_', str(orientation)])
             if key in init_response.keys():
                 _init_response = init_response[key]
             else:
@@ -137,7 +137,7 @@ class OpponencyPopulation(BaseClass):
     ):
         self.neurons = {}
         for eye, orientation in product(self.eyes, self.orientations):
-            key = '_'.join([eye, str(orientation)])
+            key = ''.join([eye, '_', str(orientation)])
             if key in init_response.keys():
                 _init_response = init_response[key]
             else:
@@ -168,7 +168,7 @@ class OpponencyPopulation(BaseClass):
         for eye in self.eyes:
             suppressive_drive_eye = suppressive_drives[eye]
             for orientation in self.orientations:
-                key = '_'.join([eye, str(orientation)])
+                key = ''.join([eye, '_', str(orientation)])
                 self.neurons[key].update_state(suppressive_drive_eye, dt)
                 
     @property
