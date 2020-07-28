@@ -2,6 +2,7 @@ import numpy as np
 from itertools import product
 from dataclasses import dataclass
 from typing import List
+import pandas as pd
 
     
 @dataclass(frozen=True)
@@ -19,6 +20,39 @@ class Snapshot:
     summation_2: float
     attention_1: float
     attention_2: float        
+        
+@dataclass(frozen=True)
+class ExtendedSnapshot(Snapshot):
+    sensory_left_1_excitation: float
+    sensory_left_2_excitation: float
+    sensory_right_1_excitation: float
+    sensory_right_2_excitation: float
+    summation_1_excitation: float
+    summation_2_excitation: float
+    opponency_left_1_excitation: float
+    opponency_left_2_excitation: float
+    opponency_right_1_excitation: float
+    opponency_right_2_excitation: float
+    attention_1_excitation: float
+    attention_2_excitation: float
+    sensory_left_1_suppression: float
+    sensory_left_2_suppression: float
+    sensory_right_1_suppression: float
+    sensory_right_2_suppression: float
+    summation_1_suppression: float
+    summation_2_suppression: float
+    opponency_left_1_suppression: float
+    opponency_left_2_suppression: float
+    opponency_right_1_suppression: float
+    opponency_right_2_suppression: float
+    attention_1_suppression: float
+    attention_2_suppression: float
+    sensory_left_1_habituation: float
+    sensory_left_2_habituation: float
+    sensory_right_1_habituation: float
+    sensory_right_2_habituation: float
+    summation_1_habituation: float
+    summation_2_habituation: float
         
         
 @dataclass
@@ -58,3 +92,10 @@ class BaseClass:
             self.rectification = smooth_rectification
         else:
             self.rectification = non_smooth_rectfication
+            
+            
+def timecourse2pandas(timecourse):
+    fields = timecourse.snapshots[-1].__dataclass_fields__.keys()
+    return pd.DataFrame({
+        field: timecourse.get_neuron_over_time(field) for field in fields
+    })
