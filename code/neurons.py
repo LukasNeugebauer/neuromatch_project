@@ -38,6 +38,7 @@ class SensoryNeuron(BaseClass):
         self.response = init_response
         self.habituation = init_habituation
         self.opponency_response = 0
+        self._excitatory_drive = 0
 
     def update_state(
         self,
@@ -129,6 +130,7 @@ class SummationNeuron(BaseClass):
         self.tau_habituation = tau_habituation
         self.response = init_response
         self.habituation = init_habituation
+        self._excitatory_drive = 0
 
     def update_state(
         self,
@@ -200,6 +202,7 @@ class OpponencyNeuron(BaseClass):
         self.n = n
         self.tau_response = tau_response
         self.response = init_response
+        self._excitatory_drive = 0
 
     def update_state(
         self,
@@ -253,6 +256,7 @@ class AttentionNeuron(BaseClass):
         self.n = n
         self.tau_response = tau_response
         self.response = init_response
+        self._excitatory_drive = 0
 
     def compute_excitatory_drive(
         self,
