@@ -60,8 +60,9 @@ class SensoryNeuron(BaseClass):
         snapshot
     ):
         attention_response = getattr(snapshot, f'attention_{self.orientation}')
+        other_eye = 'left' if self.eye =='right' else 'left'
         opponency_response = np.sum(
-            [getattr(snapshot, 'opponency_{}_{}'.format(self.eye, orientation)) for orientation in self.orientations]
+            [getattr(snapshot, 'opponency_{}_{}'.format(other_eye, orientation)) for orientation in self.orientations]
         )
         try:
             self._excitatory_drive = self.rectification(
