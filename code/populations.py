@@ -5,6 +5,7 @@ sys.path.append('.')
 from neurons import *
 from utilities import *
 
+
 class SensoryPopulation(BaseClass):
     
     def __init__(
@@ -26,7 +27,7 @@ class SensoryPopulation(BaseClass):
         for eye, orientation in product(self.eyes, self.orientations):
             key = '_'.join([eye, str(orientation)])
             if key in init_response.keys():
-                _init_response = init_reponse[key]
+                _init_response = init_response[key]
             else:
                 print(f'WARNING: Taking random start value for sensory neuron for eye {eye}, orientation {orientation}')
                 _init_response = np.random.rand()
@@ -88,7 +89,7 @@ class SummationPopulation(BaseClass):
         for orientation in self.orientations:
             key = str(orientation)
             if key in init_response.keys():
-                _init_response = init_reponse[key]
+                _init_response = init_response[key]
             else:
                 print(f'WARNING: Taking random start value for summation neuron for orientation {orientation}')
                 _init_response = np.random.rand()
@@ -138,7 +139,7 @@ class OpponencyPopulation(BaseClass):
         for eye, orientation in product(self.eyes, self.orientations):
             key = '_'.join([eye, str(orientation)])
             if key in init_response.keys():
-                _init_response = init_reponse[key]
+                _init_response = init_response[key]
             else:
                 print(f'WARNING: Taking random start value for opponency neuron for eye {eye}, orientation {orientation}')
                 _init_response = np.random.rand()
@@ -195,7 +196,7 @@ class AttentionPopulation(BaseClass):
         for orientation in self.orientations:
             key = str(orientation)
             if key in init_response.keys():
-                _init_response = init_reponse[key]
+                _init_response = init_response[key]
             else:
                 print(f'WARNING: Taking random start value for attention neuron for orientation {key}')
                 _init_response = np.random.rand()
