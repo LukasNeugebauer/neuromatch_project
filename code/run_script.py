@@ -4,6 +4,7 @@ from network import Network
 from defaults import get_input, get_default_parameters
 import pickle
 from scipy.io import loadmat
+from unpack_mat_data import load_mat_data
 
 
 if __name__ == '__main__':
@@ -55,8 +56,9 @@ if __name__ == '__main__':
 
     # plt.show()
 
-    ref_data_path = r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat'
-    mat_data = loadmat(ref_data_path)
+    mat_data = load_mat_data(file_path=r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat')
+#     ref_data_path = r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat'
+#     mat_data = loadmat(ref_data_path)
     fig, ax = plt.subplots(nrows=6, ncols=1)
     ax[0].plot(np.array(mat_data['d1']).T)
     ax[1].plot(np.array(mat_data['d2']).T)
