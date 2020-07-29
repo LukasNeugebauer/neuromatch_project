@@ -2,6 +2,7 @@ import sys
 sys.path.append('.')
 from populations import *
 from utilities import *
+from tqdm import tqdm
 
 
 class Network:
@@ -88,7 +89,9 @@ class Network:
         Expects n_timepoints x 2 sensory_input
         """
         timecourse = Timecourse([self.snapshot])
-        for t in range(sensory_input.shape[0]):
+        n_iter = sensory_input.shape[0]
+        print(f'Running simulation for {n_iter} iterations.')
+        for t in tqdm(range(n_iter)):
             if t == sensory_input.shape[0] - 1:
                 self.one_step(sensory_input.iloc[t, :])
             else:
