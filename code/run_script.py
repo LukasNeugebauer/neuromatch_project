@@ -2,14 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from network import Network
 from defaults import get_input, get_default_parameters
-import pickle
-from scipy.io import loadmat
+# import pickle
 from unpack_mat_data import load_mat_data
 
 
-if __name__ == '__main__':
-    params = get_default_parameters()
-
+def init_state(params):
     # sensory
     # sens_l_rand_matlab = np.random.rand() * 0.2
     sens_l_rand_matlab = 0.083404400940515
@@ -28,51 +25,55 @@ if __name__ == '__main__':
     params[3]['init_response'] = {'1': 0, '2': 0}
     params[3]['init_habituation'] = {'1': 0, '2': 0}
 
-    #
-    network = Network(.5, *params)
+    return params
+#
 
-    print(network.snapshot)
+
+if __name__ == '__main__':
+    # get params and init to matlab seed
+    params = get_default_parameters()
+    init_state(params)
+
+    # initialize the network
+    network = Network(.5, *params)
+    # print(network.snapshot)
 
     dt = params[0]['dt']
     total_duration = params[0]['total_duration']
-
     sensory_input = get_input(dt, total_duration)
-    sensory_input = sensory_input[:10000]
-    # plt.plot(sensory_input.values[:100])
+
+    sensory_input = sensory_input[:30000]
 
     timecourse = network.simulate(sensory_input)
-    summation_1 = timecourse.get_neuron_over_time('summation_1')
-    summation_2 = timecourse.get_neuron_over_time('summation_2')
 
-    print(summation_1)
-    snap = timecourse.snapshots[-1]
-    fields = snap.__dict__.keys()
-    n_neurons = len(fields)
+    n = 30000
+    mat_data = load_mat_data(file_path=r'matlab_timecourse.mat')
 
-    fig, axs = plt.subplots(figsize=(30, n_neurons * 3), ncols=2, nrows=int(n_neurons / 2))
-    for ax, field in zip(axs.flat, fields):
-        ax.plot(timecourse.get_neuron_over_time(field))
-        ax.set_title(field)
-
-    # plt.show()
-
-    mat_data = load_mat_data(file_path=r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat')
-#     ref_data_path = r'C:\Users\Nabbefeld\Desktop\NMA\AttentionRivalryModel\matlab_timecourse.mat'
-#     mat_data = loadmat(ref_data_path)
-    fig, ax = plt.subplots(nrows=6, ncols=1)
-    ax[0].plot(np.array(mat_data['d1']).T)
-    ax[1].plot(np.array(mat_data['d2']).T)
-    ax[2].plot(np.array(mat_data['d3']).T)
-    ax[3].plot(np.array(mat_data['d4']).T)
-    ax[4].plot(np.array(mat_data['d5']).T)
-    ax[5].plot(np.array(mat_data['d6']).T)
+    fig, ax = plt.subplots(nrows=6, ncols=2)
+    all_keys = mat_data['r'].keys()
+    i = 0
+    for key in all_keys:
+        ax_i = int(np.floor(i / 2))
+        ax_j = np.mod(i, 2)
+        ax[ax_i, ax_j].plot(np.array([mat_data['r'][key][0, :n], timecourse.get_neuron_over_time(key)[:n]]).T)
+        ax[ax_i, ax_j].set_title(key)
+        if 'attention' in key:
+            ax[ax_i, ax_j].set_ylim([-0.5, 0.5])
+        else:
+            ax[ax_i, ax_j].set_ylim([0., 1.])
+        #
+        i += 1
+    #
+    # mng = plt.get_current_fig_manager()
+    # mng.frame.Maximize(True)
+    mng = plt.get_current_fig_manager()
+    mng.window.state('zoomed')
+    plt.draw()
+    plt.savefig('Comparrision Matlab and Python.png')
     plt.show()
 
-    # save the results
-    save_path = open('last_timecourse.pkl', 'wb')
-    pickle.dump(timecourse, save_path)
-    save_path.close()
-
-    a = np.array([1.])
-    print(a[a < 2])
+    # # save the results
+    # save_path = open('last_timecourse.pkl', 'wb')
+    # pickle.dump(timecourse, save_path)
+    # save_path.close()
 #

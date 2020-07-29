@@ -4,7 +4,7 @@ from populations import *
 from utilities import *
 
 
-class Network(BaseClass):
+class Network:
     
     def __init__(
         self, 
@@ -15,6 +15,7 @@ class Network(BaseClass):
         attention_population_arguments,
     ):
         self.dt = dt
+        self.populations = None
         self.init_populations(
             sensory_population_arguments,
             summation_population_arguments,

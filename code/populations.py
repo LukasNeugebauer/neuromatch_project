@@ -231,6 +231,7 @@ class AttentionPopulation(BaseClass):
                 
     @property
     def suppressive_drives(self):
+        # [self.rectification(neuron.excitatory_drive) for neuron in self.neurons.values()]
         return np.sum(
-            [self.rectification(neuron.excitatory_drive) for neuron in self.neurons.values()]
+            [np.abs(neuron.excitatory_drive) for neuron in self.neurons.values()]
         )

@@ -1,8 +1,6 @@
-import numpy as np
-from itertools import product
+from utilities import *
 import sys
 sys.path.append('.')
-from utilities import *
 
 
 class SensoryNeuron(BaseClass):
@@ -262,13 +260,13 @@ class AttentionNeuron(BaseClass):
         self,
         snapshot
     ):
-        response_same_orientation = getattr(
-            snapshot, f'summation_{self.orientation}'
-        )
         response_other_orientation = getattr(
             snapshot, f'summation_{sum(self.orientations) - self.orientation}'
         )
-        response_difference = (response_same_orientation - response_other_orientation)
+        response_same_orientation = getattr(
+            snapshot, f'summation_{self.orientation}'
+        )
+        response_difference = response_same_orientation - response_other_orientation
         self._excitatory_drive = np.sign(response_difference) * (response_difference ** self.n)
 
     def update_state(
