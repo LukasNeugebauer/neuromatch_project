@@ -7,7 +7,9 @@ from modules.unpack_mat_data import load_mat_data
 
 
 def plot_activity(timecourse, dt, file_base):
-    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=[16, 10])
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=[18, 10])
+
+    lw = 3.
 
     cl = np.array([[0, 180, 77],
                    [230, 133, 36],
@@ -37,11 +39,11 @@ def plot_activity(timecourse, dt, file_base):
             ax[ax_i].plot(x, np.array([
                 timecourse.get_neuron_over_time('opponency_left_1') +
                 timecourse.get_neuron_over_time('opponency_left_2')
-            ]).T, label='left', color=cl[0])
+            ]).T, label='left', color=cl[0], linewidth=lw)
             ax[ax_i].plot(x, np.array([
                 timecourse.get_neuron_over_time('opponency_right_1') +
                 timecourse.get_neuron_over_time('opponency_right_2')
-            ]).T, label='right', color=cl[-1])
+            ]).T, label='right', color=cl[-1], linewidth=lw)
         elif i == 2:
             neuron_keys = ['summation_1', 'summation_2']
             labels = ['orientation 1', 'orientation 2']
@@ -55,15 +57,15 @@ def plot_activity(timecourse, dt, file_base):
         if i == 0:
             cl_id = 0
             for neuron_id, label in zip(neuron_keys, labels):
-                ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[cl_id])
+                ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[cl_id], linewidth=lw)
                 cl_id += 1
         elif i > 1:
             cl_id = 0
             for neuron_id, label in zip(neuron_keys, labels):
                 if cl_id == 1:
-                    ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[-1])
+                    ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[-1], linewidth=lw)
                 else:
-                    ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[cl_id])
+                    ax[ax_i].plot(x, timecourse.get_neuron_over_time(neuron_id).T, label=label, color=cl[cl_id], linewidth=lw)
                 cl_id += 1
         #
 
@@ -75,12 +77,12 @@ def plot_activity(timecourse, dt, file_base):
         else:
             ax[ax_i].set_ylim([-0.05, 1.05])
         #
-        ax[ax_i].legend(loc=1, bbox_to_anchor=(1.25, 1.0))
+        ax[ax_i].legend(loc=1, bbox_to_anchor=(1.35, 1.0))
         i += 1
     #
     # mng = plt.get_current_fig_manager()
     # mng.window.state('zoomed')
-    plt.rcParams.update({'font.size': 14})
+    plt.rcParams.update({'font.size': 18})
     plt.draw()
     plt.tight_layout()
     plt.draw()
