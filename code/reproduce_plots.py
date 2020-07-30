@@ -3,7 +3,7 @@ Reproduce figure 2 of the original publication and possible more
 """
 
 from network import Network
-from utilities import timecourse2pandas
+from utilities import timecourse2pandas, add_zero_startpoint, get_model_output
 from defaults import get_default_parameters, get_input
 from os.path import join, exists
 import os
