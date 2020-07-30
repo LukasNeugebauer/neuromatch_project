@@ -2,9 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_default_parameters(attended=True):
-    dt = .5
-    total_duration = 15000
+def get_default_parameters(attended=True, dt=.5, total_duration=15000):
     time_vector = np.arange(0, total_duration, dt)
     params = {
         'dt': dt,          # time-step in forward Euler method (ms)
