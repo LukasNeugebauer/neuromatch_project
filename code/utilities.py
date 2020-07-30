@@ -3,7 +3,6 @@ from itertools import product
 from dataclasses import dataclass
 from typing import List
 import pandas as pd
-from network import Network
 
     
 @dataclass(frozen=True)
@@ -144,12 +143,3 @@ def add_zero_startpoint(params):
     return params
     
 
-def get_model_output(network_params, input_params, dt=.5):
-    """
-    generic function to run model given parameters and return data frame
-    """
-    network = Network(dt, *network_params)
-    sensory_input = get_input(**input_params)
-    timecourse = network.simulate(sensory_input)
-    df = timecourse2pandas(timecourse)
-    return df
