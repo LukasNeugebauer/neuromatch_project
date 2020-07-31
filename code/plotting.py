@@ -7,6 +7,7 @@ import seaborn as sns
 import numpy as np
 from itertools import product
 from utilities import timecourse2pandas
+from os.path import join
 
 
 def plot_cmp_dominance(

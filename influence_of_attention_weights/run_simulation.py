@@ -16,12 +16,13 @@ def overwrite_weight_attention(net, mean=.5, diff=0):
 
 
 mean = .5
-diffs = np.arange(.02, .26, .1)
+diffs = np.arange(0, 2.5, .25)
+diffs = (diffs * 100).round() / 100
 folder = 'timecourses'
 
 if __name__ == '__main__':
     
-    dt = .1
+    dt = 1.
     total_duration = 30000
     params = add_zero_startpoint(get_default_parameters())
     for pop_params in params:
@@ -30,10 +31,12 @@ if __name__ == '__main__':
     sensory_input = get_input(dt, total_duration)
     
     for diff in diffs:
-        name = f'timecourse_weight-attention_mean-{mean}_diff-{diffs}.pic'
+        name = f'timecourse_weight-attention_mean-{mean}_diff-{diff}.pic'
         savename = join(folder, name)
         if exists(savename):
+            print(f'{name} already exists')
             continue
+        print(f'Running simulation for mean={mean}, diff={diff}')
         timecourse = overwrite_weight_attention(
             Network(dt, *params), 
             diff=diff, 
@@ -41,5 +44,5 @@ if __name__ == '__main__':
         ).simulate(
             sensory_input
         )
-        with open('savename', 'wb') as f:
+        with open(savename, 'wb') as f:
             pickle.dump(timecourse, f, -1)
