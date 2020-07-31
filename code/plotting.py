@@ -9,6 +9,10 @@ from itertools import product
 from utilities import timecourse2pandas
 from os.path import join
 
+from glob import glob
+import pickle
+from os import path
+
 
 def plot_cmp_dominance(
     x_ticks, 
@@ -138,3 +142,162 @@ def savefig(fig, name, folder='', **kwargs):
         filename = join(folder, name)
     fig.savefig(filename, **kwargs)
     
+    
+
+def dominance_duration(timecourse, dt=0.5, visualization=1, file_base=''):
+    # I adapted this for my dominance-plot function. It was an ugly fix for my stuff:/
+    summation1 = timecourse.get_neuron_over_time('summation_1')
+    summation2 = timecourse.get_neuron_over_time('summation_2')
+
+    # activity for Summation is bigger -> 1
+    dominance_bool = summation2 > summation1
+
+    flanks = np.diff(dominance_bool)
+    dom_switch_ids = np.where(abs(flanks))[0]
+
+    try:
+        if dom_switch_ids[0] < 100:
+            dom_switch_ids = dom_switch_ids[1:]
+        dom_periods = dt * np.diff(dom_switch_ids)
+        dom_period_values = 1*(dominance_bool[dom_switch_ids+1])[:dom_periods.size]
+
+        try:
+            duration_0 = dom_periods[dom_period_values == 0].mean()
+            duration_1 = dom_periods[dom_period_values == 1].mean()
+
+            if np.isnan(duration_0) or np.isnan(duration_1):
+                raise (Exception(''))
+            #
+        except:
+            raise(Exception(''))
+    except:
+        if dominance_bool[-1] > 0:
+            duration_0 = 0
+            duration_1 = 100000
+        else:
+            duration_0 = 100000
+            duration_1 = 0
+    #
+
+    # print('How many changes in dominance? ', np.sum([np.abs(flanks) == 1]))
+
+    idx_start = np.where([flanks*1 == -1])[1]
+    idx_end = np.where([flanks*1 == 1])[1]
+    idx = np.sort(np.concatenate([idx_start, idx_end]))
+
+    if visualization == 1:  # visualization
+        # fig
+        plt.plot(dominance_bool, 'r')
+        plt.plot(summation2)
+        plt.plot(idx, np.zeros(np.shape(idx)), 'ko')
+        plt.draw()
+        plt.savefig(file_base + '_dominance_periods.png')
+        plt.close()
+        # plt.show()
+
+    return duration_0, duration_1  # dominance_duration_2, dominance_duration_1
+#
+
+
+def plot_dominance_durations_gerion(data_path, x_label, figure_name):
+    # It is super ugly how I did this in the end. Really have to make this pretty at some point! 
+    data_paths = glob(path.join(data_path, '*.pkl'))
+    # file_path = data_paths[0]
+    plot_data = dict()
+    for file_path in data_paths:
+        print(file_path)
+        try:
+            with open(file_path, 'rb') as f:
+                data = pickle.load(f)
+            #
+
+            if file_path == 'simulation_ext_attention_drive_[0.065,-0.065].pkl':
+                print('break')
+
+            file_base = path.splitext(file_path)[0]
+            duration_0, duration_1 = dominance_duration(timecourse=data, dt=1, visualization=1,
+                                                        file_base=file_base)
+
+            # [dominance_duration_1.mean(), dominance_duration_2.mean()]
+            attention_difference = np.diff([np.float(i) for i in file_base.split('[')[1].split(']')[0].split(',')])
+            if attention_difference == 0:
+                attention_difference = 0
+            plot_data['%0.3f' % -attention_difference] = [np.mean(duration_0), np.mean(duration_1)]
+        except Exception as e:
+            print(e)
+        #
+    #
+
+    cl = np.array([[0, 180, 77],
+                   [230, 133, 36],
+                   [230, 230, 36],
+                   [75, 122, 191]
+                   ]) / 255.
+
+    lw = 2.5
+
+    fig, ax = plt.subplots(1, 2, figsize=[10, 5])
+    plt.rcParams.update({'font.size': 14})
+    plot1_data = np.array([i[0] for i in plot_data.values()])
+    plot2_data = np.array([i[1] for i in plot_data.values()])
+    x = np.array([float(i) for i in plot_data.keys()])
+    # ax[0].set_ylim([-0.001, 0.001])
+
+    try:
+        wta_ids = plot1_data + plot2_data > 10000
+        wta_ids = np.where(wta_ids)[0][0]
+        inf_line = plot1_data + plot2_data > 10000
+
+        plot1_data[wta_ids:] = np.nan
+        plot2_data[wta_ids:] = np.nan
+    except:
+        pass
+    #
+
+    ax[0].plot(x, 0.001 * np.array(plot1_data), color=cl[0], linewidth=lw, label='Orientation 1')
+    ax[0].plot(x, 0.001 * np.array(plot2_data), color=cl[-1], linewidth=lw, label='Orientation 2')
+    temp_ylim = ax[0].get_ylim()
+    try:
+        # inf_line = plot1_data + plot2_data > 10000
+        inf_line = inf_line.astype(np.float)
+        inf_id = np.where(inf_line)[0][0]
+        pre_inf_id = inf_id-1
+        inf_line = np.array(10000 * inf_line)
+        inf_line[pre_inf_id] = 0.001 * np.max([plot1_data[pre_inf_id], plot2_data[pre_inf_id]])
+        ax[0].plot(x[inf_line > 0], inf_line[inf_line > 0], color=cl[0], linestyle=(0, (5, 10)), linewidth=lw)
+        ax[0].plot(x[inf_id:], 0 * inf_line[inf_id:], color=cl[-1], linewidth=lw)
+        inf_line[inf_line >= 1000] = 0
+        inf_line[pre_inf_id] = 0.001 * np.min([plot1_data[pre_inf_id], plot2_data[pre_inf_id]])
+        ax[0].plot(x[inf_id-1:inf_id+1], inf_line[inf_id-1:inf_id+1], color=cl[-1], linestyle=(0, (5, 10)), linewidth=lw)
+    except Exception as e:
+        pass
+    #
+
+    try:
+        # ax[0].set_ylim(temp_ylim)
+        ax[0].legend()
+        ratio = plot1_data[:pre_inf_id] / (plot1_data[:pre_inf_id] + plot2_data[:pre_inf_id])
+        ax[1].plot(x[:pre_inf_id], 100 * ratio, color='k', linewidth=lw)
+        ax[1].plot(x[pre_inf_id-1:pre_inf_id+1], [100 * ratio[-1], 100], color='k', linestyle=(0, (5, 10)), linewidth=lw)
+        ax[1].plot(x[pre_inf_id:], 100 + 0 * x[pre_inf_id:], color='k', linewidth=lw)
+        ax[0].set_ylim([-0.1, 6.4])
+    except:
+        ratio = plot1_data / (plot1_data + plot2_data)
+        ax[1].plot(x, 100 * ratio, color='k', linewidth=lw)
+    #
+
+    ax[0].set_title('Summation dominance')
+    ax[1].set_title('Relative dominance')
+
+    ax[0].set_ylabel('dominance duration [sec]')
+    ax[1].set_ylabel('relative dominance [%]')
+
+    ax[0].set_xlabel(x_label)
+    ax[1].set_xlabel(x_label)
+
+    plt.tight_layout()
+    plt.draw()
+    plt.savefig(figure_name)
+
+    plt.close()
+#
