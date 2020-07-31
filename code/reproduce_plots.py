@@ -9,58 +9,8 @@ from os.path import join, exists
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from plotting import savefig
 
-#dictionary of parameters that define starting position for figure 2
-
-
-def add_zero_startpoint(params):
-    """
-    update the params so that everything starts at 0
-    and sensory_left_1 and opponency_left_1 start at fixed points
-    """
-    params[0].update({
-        'init_response': {
-            'left_1': 0.083404400940515,
-            'left_2': 0.,
-            'right_1': 0.,
-            'right_2': 0.
-        },
-        'init_habituation': {
-            key: 0. for key in ['left_1', 'left_2', 'right_1', 'right_2']
-        }
-    })
-    params[2].update({
-        'init_response': {
-            'left_1': 0.144064898688432,
-            'left_2': 0.,
-            'right_1': 0.,
-            'right_2': 0.
-        },
-        'init_habituation': {
-            key: 0. for key in ['left_1', 'left_2', 'right_1', 'right_2']
-        }
-    })
-    for lay in [1,3]:
-        params[lay].update({
-            'init_response': {
-                key: 0. for key in ['1', '2']
-            },
-            'init_habituation': {
-                key: 0. for key in ['1', '2']
-            }
-        })
-    return params
-    
-
-def get_model_output(network_params, input_params, dt=.5):
-    """
-    generic function to run model given parameters and return data frame
-    """
-    network = Network(dt, *network_params)
-    sensory_input = get_input(**input_params)
-    timecourse = network.simulate(sensory_input)
-    df = timecourse2pandas(timecourse)
-    return df
 
     
 def reproduce_figure_2(**fig_kwargs):
@@ -163,11 +113,6 @@ def reproduce_figure_2(**fig_kwargs):
     axs[1,1].spines['top'].set_visible(False)
     
     return fig, axs
-    
-def savefig(fig, name, folder='', **kwargs):
-    if folder:
-        filename = join(folder, name)
-    fig.savefig(filename, **kwargs)
     
 if __name__ == '__main__':
     fig, axs = reproduce_figure_2()
