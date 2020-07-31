@@ -5,7 +5,7 @@ from utilities import *
 from tqdm import tqdm
 
 
-class Network:
+class Network(BaseClass):
     
     def __init__(
         self, 
